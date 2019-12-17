@@ -1,0 +1,30 @@
+---
+title: "Protein Coding Genes"
+output: html_notebook
+---
+
+```{r}
+library(biomaRt)
+
+ensembl=useMart(biomart='ensembl', dataset='hsapiens_gene_ensembl')
+filters = listFilters(ensembl)
+attributes = listAttributes(ensembl)
+bbh = getBM(attributes = c('ensembl_gene_id',
+    'hgnc_symbol', 'gene_biotype'), mart = ensembl)
+bbh
+```
+
+
+```{r}
+library(dplyr)
+
+
+PRC<- bbh[,c("ensembl_gene_id","hgnc_symbol","gene_biotype")]
+Protein_coding_Genes<- PRC[bbh$gene_biotype == 'protein_coding',]
+
+Protein_coding_Genes<- bbh %>%
+  select('ensembl_gene_id', 'hgnc_symbol', 'gene_biotype') %>%
+  filter(gene_biotype == "protein_coding")
+#write to output
+write.table(Protein_coding_Genes, "protein_coding_genes.txt", sep="\t", row.names = FALSE)
+```
